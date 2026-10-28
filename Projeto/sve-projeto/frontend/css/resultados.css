@@ -1,0 +1,33 @@
+.resultados-resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 25px 0;
+}
+
+.resultado-box {
+    background: #f4f4f4;
+    border-left: 6px solid #002b55;
+    padding: 18px;
+}
+
+.resultado-box h3 {
+    margin: 0;
+    color: #002b55;
+}
+
+.resultado-box p {
+    margin: 8px 0 0;
+    font-weight: 700;
+}
+
+.grafico-container {
+    margin-top: 35px;
+    background: white;
+    padding: 25px;
+    border: 2px solid #002b55;
+}
+
+#graficoResultados {
+    max-height: 380px;
+}

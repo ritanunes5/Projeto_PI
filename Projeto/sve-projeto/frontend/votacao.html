@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Votação</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-forms.css">
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+    <img src="assets/logotipo_sve.png" class="dashboard-logo" alt="SVE">
+
+    <div class="dashboard-title">
+        SISTEMA DE VOTAÇÃO<br>
+        ELETRÓNICA
+    </div>
+
+    <nav class="dashboard-nav">
+        <a href="eleitor-dashboard.html">HOME</a>
+        <a href="votacao.html">ELEIÇÕES</a>
+        <a href="resultados.html">RESULTADOS</a>
+        <a href="ajuda.html">AJUDA</a>
+    </nav>
+
+    <div class="dashboard-user" id="nomeUser">ELEITOR</div>
+
+    <a href="index.html" class="logout-btn">SAIR</a>
+</header>
+
+<main class="dashboard-main">
+    <section class="content-card">
+
+        <h1>Área de Votação</h1>
+
+        <div class="form-grid">
+            <label for="eleicao">Escolha a eleição:</label>
+            <select id="eleicao"></select>
+        </div>
+
+        <h2>Candidatos</h2>
+
+        <p id="mensagem"></p>
+
+        <div id="candidatos"></div>
+
+    </section>
+</main>
+
+<div class="footer-bar"></div>
+
+<script>
+const userId = localStorage.getItem("user_id");
+const nome = localStorage.getItem("user_nome");
+
+if (nome) {
+    document.getElementById("nomeUser").innerText = nome;
+}
+
+if (!userId) {
+    alert("Tens de iniciar sessão primeiro.");
+    window.location.href = "eleitor-login.html";
+}
+
+async function carregarEleicoes() {
+    const response = await fetch("http://localhost:8001/elections");
+    const eleicoes = await response.json();
+
+    const select = document.getElementById("eleicao");
+    select.innerHTML = "";
+
+    eleicoes
+        .filter(eleicao => eleicao.estado === "ativa")
+        .forEach(eleicao => {
+            select.innerHTML += `
+                <option value="${eleicao.id}">
+                    ${eleicao.titulo}
+                </option>
+            `;
+        });
+
+    carregarCandidatos();
+}
+
+async function carregarCandidatos() {
+    const electionId = Number(document.getElementById("eleicao").value);
+
+    const response = await fetch(`http://localhost:8001/candidates/${electionId}`);
+    const candidatos = await response.json();
+
+    const container = document.getElementById("candidatos");
+    container.innerHTML = "";
+
+    if (candidatos.length === 0) {
+        container.innerHTML = "<p>Não existem candidatos para esta eleição.</p>";
+        return;
+    }
+
+    candidatos.forEach(candidato => {
+        container.innerHTML += `
+            <div class="list-card">
+                <h3>${candidato.nome}</h3>
+                <p>${candidato.partido}</p>
+                <button class="vote-btn" onclick="votar(${candidato.id})">
+                    Votar
+                </button>
+            </div>
+        `;
+    });
+}
+
+async function votar(candidateId) {
+    const electionId = Number(document.getElementById("eleicao").value);
+
+    const confirmar = confirm("Tens a certeza que queres submeter o teu voto?");
+
+    if (!confirmar) return;
+
+    const response = await fetch("http://localhost:8001/cast-vote", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            user_id: Number(userId),
+            election_id: electionId,
+            candidate_id: candidateId
+        })
+    });
+
+    const resultado = await response.json();
+
+    if (!response.ok) {
+        alert(resultado.detail);
+        return;
+    }
+
+    alert("Voto registado com sucesso.");
+
+    document.getElementById("mensagem").innerText =
+        "O teu voto foi registado com sucesso.";
+
+    document.getElementById("candidatos").innerHTML =
+        "<p>Já votaste nesta eleição.</p>";
+}
+
+document.getElementById("eleicao").addEventListener("change", carregarCandidatos);
+
+carregarEleicoes();
+</script>
+
+</body>
+</html>

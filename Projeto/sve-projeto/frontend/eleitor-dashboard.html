@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Eleitor</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+
+    <img src="assets/logotipo_sve.png" class="dashboard-logo" alt="SVE">
+
+    <div class="dashboard-title">
+        SISTEMA DE VOTAÇÃO<br>
+        ELETRÓNICA
+    </div>
+
+    <nav class="dashboard-nav">
+        <a href="eleitor-dashboard.html">HOME</a>
+        <a href="votacao.html">ELEIÇÕES</a>
+        <a href="resultados.html">RESULTADOS</a>
+        <a href="ajuda.html">AJUDA</a>
+    </nav>
+
+    <div class="dashboard-user" id="nomeUser">
+        ELEITOR
+    </div>
+
+    <a href="index.html" class="logout-btn">SAIR</a>
+
+</header>
+
+<main class="dashboard-main">
+
+    <section class="welcome-card">
+        <div>
+            <h1>BEM-VINDO, SR ELEITOR</h1>
+            <p>EXERÇA O SEU DIREITO DE VOTO. DEMOCRACIA É PARTICIPAÇÃO.</p>
+        </div>
+
+        <a href="votacao.html" class="primary-action">
+            VER ELEIÇÕES
+        </a>
+    </section>
+
+    <section class="dashboard-cards">
+        <div class="info-card">
+            <h2>Estado</h2>
+            <p>Autenticação efetuada com sucesso.</p>
+        </div>
+
+        <div class="info-card">
+            <h2>Informação</h2>
+            <p>Consulte as eleições disponíveis e acompanhe os resultados eleitorais.</p>
+        </div>
+    </section>
+
+</main>
+
+<div class="footer-bar">
+    <a href="contactos.html">Contactos</a>
+    <a href="sobre.html">Sobre o Sistema</a>
+    <a href="ajuda.html">Ajuda</a>
+</div>
+
+<script>
+const nome = localStorage.getItem("user_nome");
+
+if (nome) {
+    document.getElementById("nomeUser").innerText = nome;
+}
+</script>
+
+</body>
+</html>

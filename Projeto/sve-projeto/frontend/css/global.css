@@ -1,0 +1,37 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #ececec;
+}
+
+:root {
+  --azul: #002b55;
+  --azul-hover: #003d75;
+  --verde: #006b2f;
+  --vermelho: #ff1b1b;
+  --amarelo: #ffd100;
+}
+
+.logo-sve {
+  width: 170px;
+  height: auto;
+}
+
+.landing-btn {
+  background: var(--azul);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.landing-btn:hover {
+  background: var(--azul-hover);
+  transform: scale(1.02);
+}

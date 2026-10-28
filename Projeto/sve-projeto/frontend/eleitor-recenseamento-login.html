@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login por Recenseamento</title>
+
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/eleitor-recenseamento-login.css">
+</head>
+
+<body class="recenseamento-login-page">
+
+    <div class="decor-line top-left"></div>
+    <div class="decor-circle red"></div>
+    <div class="decor-circle green"></div>
+    <div class="decor-line bottom-right"></div>
+
+    <main class="recenseamento-login-container">
+
+        <img src="assets/logotipo_sve.png" alt="Logotipo SVE" class="login-sve">
+
+        <h1>Recenseamento</h1>
+
+        <form class="recenseamento-form">
+
+            <label for="numero_identificacao">Número de Identificação</label>
+            <input
+                type="text"
+                id="numero_identificacao"
+                maxlength="9"
+                pattern="[0-9]{9}"
+                placeholder="Insira os 9 dígitos"
+                required
+            >
+
+            <label for="data_nascimento">Data de Nascimento</label>
+            <input
+                type="date"
+                id="data_nascimento"
+                required
+            >
+
+            <label for="freguesia">Freguesia</label>
+            <input
+                type="text"
+                id="freguesia"
+                placeholder="Insira a freguesia"
+                required
+            >
+
+            <button type="submit" class="landing-btn">
+                VALIDAR IDENTIDADE
+            </button>
+
+            <a href="eleitor-login.html" class="back-link">
+                Voltar
+            </a>
+
+        </form>
+
+    </main>
+
+    <script>
+        const form = document.querySelector(".recenseamento-form");
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const numeroIdentificacao = document.getElementById("numero_identificacao").value;
+            const dataNascimento = document.getElementById("data_nascimento").value;
+            const freguesia = document.getElementById("freguesia").value;
+
+            try {
+                const response = await fetch("http://localhost:8001/login_recenseamento", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        numero_identificacao: numeroIdentificacao,
+                        data_nascimento: dataNascimento,
+                        freguesia: freguesia
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.detail);
+                    return;
+                }
+
+                alert("Login realizado com sucesso!");
+
+                localStorage.setItem("user_id", data.id);
+                localStorage.setItem("user_nome", data.nome);
+
+                window.location.href = "eleitor-dashboard.html";
+
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao ligar ao servidor.");
+            }
+        });
+    </script>
+
+</body>
+</html>

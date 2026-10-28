@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SVE</title>
+    <link rel="icon" href="data:,">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/landing.css">
+</head>
+
+<body class="landing-page">
+
+    <div class="decor-line top-left"></div>
+    <div class="decor-circle red"></div>
+    <div class="decor-circle green"></div>
+    <div class="decor-line bottom-right"></div>
+
+    <main class="landing-content">
+
+        <section class="brand">
+            <img src="assets/logotipo_sve.png"
+                 alt="Logotipo SVE"
+                 class="logo-sve">
+        </section>
+
+        <h1 class="landing-title">
+            SVE - Sistema de Votos Eletrónico Português
+        </h1>
+
+        <section class="menu-buttons">
+
+            <a href="login-opcoes.html" class="landing-btn">
+                LOGIN
+            </a>
+
+            <a href="criar-conta.html" class="landing-btn">
+                CRIAR CONTA
+            </a>
+
+            <a href="resultados.html" class="landing-btn">
+                RESULTADOS / SONDAGENS
+            </a>
+
+            <a href="quem-pode-votar.html" class="landing-btn">
+                QUEM PODE VOTAR?
+            </a>
+
+            <a href="ajuda.html" class="landing-btn">
+                AJUDA
+            </a>
+
+        </section>
+
+        </main>
+
+    <div class="landing-footer">
+        <a href="contactos.html">CONTACTOS</a>
+        <a href="sobre.html">SOBRE O PROJETO</a>
+    </div>
+
+    <script>
+        fetch("http://localhost:8001/health")
+            .then(response => response.json())
+            .then(data => console.log("API:", data))
+            .catch(error => console.error("Erro ao ligar à API:", error));
+    </script>
+
+</body>
+</html>

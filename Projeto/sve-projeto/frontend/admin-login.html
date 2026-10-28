@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrador</title>
+
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/admin-login.css">
+</head>
+
+<body class="admin-login-page">
+
+    <div class="decor-line top-left"></div>
+    <div class="decor-circle red"></div>
+    <div class="decor-circle green"></div>
+    <div class="decor-line bottom-right"></div>
+
+    <main class="admin-login-container">
+
+        <img src="assets/logotipo_sve.png" alt="Logotipo SVE" class="login-sve">
+
+        <h1>Administrador</h1>
+
+        <form id="adminLoginForm" class="admin-form">
+
+            <label for="email">Email Institucional</label>
+            <input type="email" id="email" placeholder="Email institucional" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Password" required>
+
+            <label for="codigo_admin">Código de Administrador</label>
+            <input type="text" id="codigo_admin" placeholder="Código de administrador" required>
+
+            <button type="submit" class="landing-btn">
+                ENTRAR
+            </button>
+
+            <a href="login-opcoes.html" class="back-link">
+                Voltar
+            </a>
+
+        </form>
+
+    </main>
+
+    <script>
+        document.getElementById("adminLoginForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const dados = {
+                email_institucional: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+                codigo_admin: document.getElementById("codigo_admin").value
+            };
+
+            const response = await fetch("http://localhost:8001/login_admin", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const resultado = await response.json();
+
+            if (!response.ok) {
+                alert(resultado.detail);
+                return;
+            }
+
+            localStorage.setItem("admin_id", resultado.id);
+            localStorage.setItem("admin_nome", resultado.nome);
+
+            alert("Login de administrador realizado com sucesso.");
+            window.location.href = "admin-dashboard.html";
+        });
+    </script>
+
+</body>
+</html>

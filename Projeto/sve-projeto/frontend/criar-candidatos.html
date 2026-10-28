@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Candidato</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-forms.css">
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+    <img src="assets/logotipo_sve.png" class="dashboard-logo" alt="SVE">
+
+    <div class="dashboard-title">
+        SISTEMA DE VOTAÇÃO<br>
+        ELETRÓNICA
+    </div>
+
+    <nav class="dashboard-nav">
+        <a href="admin-dashboard.html">HOME</a>
+        <a href="criar-eleicao.html">ELEIÇÕES</a>
+        <a href="criar-candidatos.html">CANDIDATOS</a>
+        <a href="resultados.html">RESULTADOS</a>
+    </nav>
+
+    <div class="dashboard-user" id="nomeAdmin">ADMIN</div>
+
+    <a href="index.html" class="logout-btn">SAIR</a>
+</header>
+
+<main class="dashboard-main">
+    <section class="content-card">
+
+        <h1>Criar Candidato</h1>
+
+        <form id="formCandidato" class="form-grid">
+
+            <label>Eleição:</label>
+            <select id="election_id" required></select>
+
+            <input type="text" id="nome" placeholder="Nome do candidato" required>
+            <input type="text" id="partido" placeholder="Partido" required>
+            <input type="text" id="slogan" placeholder="Slogan" required>
+            <textarea id="descricao" placeholder="Descrição" required></textarea>
+            <textarea id="campanha" placeholder="Campanha" required></textarea>
+            <input type="text" id="foto" placeholder="Foto" value="sem-foto.jpg" required>
+
+            <button type="submit" class="action-btn">Criar Candidato</button>
+
+        </form>
+
+    </section>
+</main>
+
+<div class="footer-bar"></div>
+
+<script>
+const nomeAdmin = localStorage.getItem("admin_nome");
+
+if (nomeAdmin) {
+    document.getElementById("nomeAdmin").innerText = nomeAdmin;
+}
+
+async function carregarEleicoes() {
+    const response = await fetch("http://localhost:8001/elections");
+    const eleicoes = await response.json();
+
+    const select = document.getElementById("election_id");
+    select.innerHTML = "";
+
+    eleicoes.forEach(eleicao => {
+        select.innerHTML += `
+            <option value="${eleicao.id}">
+                ${eleicao.titulo}
+            </option>
+        `;
+    });
+}
+
+document.getElementById("formCandidato").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const dados = {
+        election_id: Number(document.getElementById("election_id").value),
+        nome: document.getElementById("nome").value,
+        partido: document.getElementById("partido").value,
+        slogan: document.getElementById("slogan").value,
+        descricao: document.getElementById("descricao").value,
+        campanha: document.getElementById("campanha").value,
+        foto: document.getElementById("foto").value
+    };
+
+    const response = await fetch("http://localhost:8001/candidates", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    });
+
+    const resultado = await response.json();
+
+    if (!response.ok) {
+        alert("Erro ao criar candidato: " + JSON.stringify(resultado));
+        return;
+    }
+
+    alert("Candidato criado com sucesso.");
+});
+
+carregarEleicoes();
+</script>
+
+</body>
+</html>

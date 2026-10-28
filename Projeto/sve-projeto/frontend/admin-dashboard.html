@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Administrador</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+
+    <img src="assets/logotipo_sve.png" class="dashboard-logo" alt="SVE">
+
+    <div class="dashboard-title">
+        SISTEMA DE VOTAÇÃO<br>
+        ELETRÓNICA
+    </div>
+
+    <nav class="dashboard-nav">
+        <a href="admin-dashboard.html">HOME</a>
+        <a href="criar-eleicao.html">ELEIÇÕES</a>
+        <a href="criar-candidatos.html">CANDIDATOS</a>
+        <a href="resultados.html">RESULTADOS</a>
+    </nav>
+
+    <div class="dashboard-user" id="nomeAdmin">
+        ADMIN
+    </div>
+
+    <a href="index.html" class="logout-btn">SAIR</a>
+
+</header>
+
+<main class="dashboard-main">
+
+    <section class="welcome-card">
+        <div>
+            <h1>BEM-VINDO, ADMINISTRADOR</h1>
+            <p>GERA ELEIÇÕES, CANDIDATOS E RESULTADOS DO SISTEMA.</p>
+        </div>
+
+        <a href="criar-eleicao.html" class="primary-action">
+            CRIAR ELEIÇÃO
+        </a>
+    </section>
+
+    <section class="dashboard-cards">
+        <div class="info-card">
+            <h2>Candidatos</h2>
+            <p>Crie e associe candidatos às eleições disponíveis.</p>
+            <a href="criar-candidatos.html">Criar candidato</a>
+        </div>
+
+        <div class="info-card">
+            <h2>Resultados</h2>
+            <p>Consulte os resultados eleitorais por eleição.</p>
+            <a href="resultados.html">Ver resultados</a>
+        </div>
+    </section>
+
+</main>
+
+<div class="footer-bar"></div>
+
+<script>
+const nome = localStorage.getItem("admin_nome");
+
+if (nome) {
+    document.getElementById("nomeAdmin").innerText = nome;
+}
+</script>
+
+</body>
+</html>

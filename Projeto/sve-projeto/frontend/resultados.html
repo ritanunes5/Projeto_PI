@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-forms.css">
+    <link rel="stylesheet" href="css/resultados.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+    <img src="assets/logotipo_sve.png" class="dashboard-logo" alt="SVE">
+
+    <div class="dashboard-title">
+        SISTEMA DE VOTAÇÃO<br>
+        ELETRÓNICA
+    </div>
+
+    <nav class="dashboard-nav">
+        <a id="homeLink" href="eleitor-dashboard.html">HOME</a>
+        <a id="eleicoesLink" href="votacao.html">ELEIÇÕES</a>
+        <a href="resultados.html">RESULTADOS</a>
+        <a id="ajudaLink" href="ajuda.html">AJUDA</a>
+    </nav>
+
+    <a href="index.html" class="logout-btn">SAIR</a>
+</header>
+
+<main class="dashboard-main">
+    <section class="content-card">
+
+        <h1>Resultados Eleitorais</h1>
+
+        <div class="form-grid">
+            <label for="eleicao">Escolha a eleição:</label>
+            <select id="eleicao"></select>
+        </div>
+
+        <h2>Resultados</h2>
+
+        <div id="resultados" class="resultados-resumo"></div>
+
+        <div class="grafico-container">
+            <canvas id="graficoResultados"></canvas>
+        </div>
+
+    </section>
+</main>
+
+<div class="footer-bar">
+    <a href="contactos.html">Contactos</a>
+    <a href="sobre.html">Sobre o Sistema</a>
+</div>
+
+<script>
+let grafico = null;
+
+const adminId = localStorage.getItem("admin_id");
+
+if (adminId) {
+    document.getElementById("homeLink").href = "admin-dashboard.html";
+    document.getElementById("eleicoesLink").href = "criar-eleicao.html";
+    document.getElementById("ajudaLink").style.display = "none";
+}
+
+async function carregarEleicoes() {
+    const response = await fetch("http://localhost:8001/elections");
+    const eleicoes = await response.json();
+
+    const select = document.getElementById("eleicao");
+    select.innerHTML = "";
+
+    eleicoes.forEach(eleicao => {
+        select.innerHTML += `
+            <option value="${eleicao.id}">
+                ${eleicao.titulo}
+            </option>
+        `;
+    });
+
+    carregarResultados();
+}
+
+async function carregarResultados() {
+    const electionId = Number(document.getElementById("eleicao").value);
+
+    const candidatosResponse = await fetch(`http://localhost:8001/candidates/${electionId}`);
+    const votosResponse = await fetch("http://localhost:8001/votes");
+
+    const candidatos = await candidatosResponse.json();
+    const votos = await votosResponse.json();
+
+    const resultadosDiv = document.getElementById("resultados");
+    resultadosDiv.innerHTML = "";
+
+    const votosDaEleicao = votos.filter(voto => voto.election_id === electionId);
+    const totalGeral = votosDaEleicao.length;
+
+    const nomes = [];
+    const votosGrafico = [];
+    const percentagensGrafico = [];
+
+    if (candidatos.length === 0) {
+        resultadosDiv.innerHTML = "<p>Não existem candidatos nesta eleição.</p>";
+
+        if (grafico) {
+            grafico.destroy();
+            grafico = null;
+        }
+
+        return;
+    }
+
+    candidatos.forEach(candidato => {
+        const totalVotos = votosDaEleicao.filter(
+            voto => voto.candidate_id === candidato.id
+        ).length;
+
+        const percentagem = totalGeral > 0
+            ? ((totalVotos / totalGeral) * 100).toFixed(1)
+            : 0;
+
+        nomes.push(candidato.nome);
+        votosGrafico.push(totalVotos);
+        percentagensGrafico.push(percentagem);
+
+        resultadosDiv.innerHTML += `
+            <div class="resultado-box">
+                <h3>${candidato.nome}</h3>
+                <p>${candidato.partido}</p>
+                <p>Votos: ${totalVotos}</p>
+                <p>Percentagem: ${percentagem}%</p>
+            </div>
+        `;
+    });
+
+    criarGrafico(nomes, votosGrafico, percentagensGrafico);
+}
+
+function criarGrafico(nomes, votosGrafico, percentagensGrafico) {
+    const ctx = document.getElementById("graficoResultados");
+
+    if (grafico) {
+        grafico.destroy();
+    }
+
+    grafico = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: nomes,
+            datasets: [
+                {
+                    label: "Votos",
+                    data: votosGrafico
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            return "Percentagem: " + percentagensGrafico[context.dataIndex] + "%";
+                        }
+                    }
+                },
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+}
+
+document.getElementById("eleicao").addEventListener("change", carregarResultados);
+
+carregarEleicoes();
+</script>
+
+</body>
+</html>

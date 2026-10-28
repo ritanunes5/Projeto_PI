@@ -1,0 +1,36 @@
+services:
+  api:
+    build: ./api
+    container_name: sve-api
+    ports:
+      - "8001:8000"
+    depends_on:
+      - mariadb
+    restart: on-failure
+    environment:
+      DATABASE_URL: mysql+pymysql://appuser:apppassword@mariadb:3306/sve
+
+  frontend:
+    build: ./frontend
+    container_name: sve-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+
+  mariadb:
+    image: mariadb:latest
+    container_name: sve-mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: sve
+      MARIADB_USER: appuser
+      MARIADB_PASSWORD: apppassword
+    ports:
+      - "3308:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:

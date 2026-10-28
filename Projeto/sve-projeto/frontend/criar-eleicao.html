@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Eleição</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-forms.css">
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+    <img src="assets/logotipo_sve.png" class="dashboard-logo" alt="SVE">
+
+    <div class="dashboard-title">
+        SISTEMA DE VOTAÇÃO<br>
+        ELETRÓNICA
+    </div>
+
+    <nav class="dashboard-nav">
+        <a href="admin-dashboard.html">HOME</a>
+        <a href="criar-eleicao.html">ELEIÇÕES</a>
+        <a href="criar-candidatos.html">CANDIDATOS</a>
+        <a href="resultados.html">RESULTADOS</a>
+    </nav>
+
+    <div class="dashboard-user" id="nomeAdmin">ADMIN</div>
+
+    <a href="index.html" class="logout-btn">SAIR</a>
+</header>
+
+<main class="dashboard-main">
+    <section class="content-card">
+
+        <h1>Criar Eleição</h1>
+
+        <form id="formEleicao" class="form-grid">
+            <input type="text" id="titulo" placeholder="Título da eleição" required>
+
+            <textarea id="descricao" placeholder="Descrição da eleição" required></textarea>
+
+            <label>Data de início:</label>
+            <input type="datetime-local" id="data_inicio" required>
+
+            <label>Data de fim:</label>
+            <input type="datetime-local" id="data_fim" required>
+
+            <select id="estado">
+                <option value="ativa">Ativa</option>
+                <option value="rascunho">Rascunho</option>
+                <option value="encerrada">Encerrada</option>
+            </select>
+
+            <button type="submit" class="action-btn">Criar Eleição</button>
+        </form>
+
+    </section>
+</main>
+
+<div class="footer-bar"></div>
+
+<script>
+const nomeAdmin = localStorage.getItem("admin_nome");
+
+if (nomeAdmin) {
+    document.getElementById("nomeAdmin").innerText = nomeAdmin;
+}
+
+document.getElementById("formEleicao").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const adminId = localStorage.getItem("admin_id");
+
+    if (!adminId) {
+        alert("Tens de iniciar sessão como administrador.");
+        window.location.href = "admin-login.html";
+        return;
+    }
+
+    const dados = {
+        titulo: document.getElementById("titulo").value,
+        descricao: document.getElementById("descricao").value,
+        data_inicio: document.getElementById("data_inicio").value,
+        data_fim: document.getElementById("data_fim").value,
+        estado: document.getElementById("estado").value,
+        created_by: Number(adminId)
+    };
+
+    const response = await fetch("http://localhost:8001/elections", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dados)
+    });
+
+    const resultado = await response.json();
+
+    if (!response.ok) {
+        alert("Erro ao criar eleição: " + JSON.stringify(resultado));
+        return;
+    }
+
+    alert("Eleição criada com sucesso.");
+    window.location.href = "admin-dashboard.html";
+});
+</script>
+
+</body>
+</html>

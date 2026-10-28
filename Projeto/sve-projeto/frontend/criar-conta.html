@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Conta</title>
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-forms.css">
+</head>
+
+<body class="dashboard-page">
+
+<main class="dashboard-main">
+    <section class="content-card">
+
+        <h1>Criar Conta</h1>
+
+        <form id="formCriarConta" class="form-grid">
+
+    <label>Tipo de registo</label>
+    <select id="tipoConta" required>
+        <option value="cc">Cartão de Cidadão</option>
+        <option value="cmd">Chave Móvel Digital</option>
+        <option value="recenseamento">Recenseamento Eleitoral</option>
+        <option value="admin">Administrador</option>
+    </select>
+
+
+    <input type="text" id="nome" placeholder="Nome" required>
+
+
+    <div id="campoNumeroIdentificacao">
+        <input
+            type="text"
+            id="numero_identificacao"
+            maxlength="9"
+            pattern="[0-9]{9}"
+            placeholder="Número de identificação"
+        >
+    </div>
+
+    <div id="campoDataNascimento" style="display:none;">
+        <input
+            type="date"
+            id="data_nascimento"
+        >
+    </div>
+
+    <div id="campoFreguesia" style="display:none;">
+        <input
+            type="text"
+            id="freguesia"
+            placeholder="Freguesia de recenseamento"
+        >
+    </div>
+
+    <div id="campoTelefone" style="display:none;">
+        <input
+            type="text"
+            id="telefone"
+            maxlength="9"
+            pattern="[0-9]{9}"
+            placeholder="Número de telemóvel"
+        >
+    </div>
+
+    <div id="campoPin" style="display:none;">
+        <input
+            type="password"
+            id="codigo"
+            maxlength="4"
+            pattern="[0-9]{4}"
+            placeholder="PIN CMD"
+        >
+    </div>
+
+    <div id="campoAdmin" style="display:none;">
+        <input
+            type="email"
+            id="email_admin"
+            placeholder="Email institucional"
+        >
+
+        <input
+            type="password"
+            id="password_admin"
+            placeholder="Password"
+        >
+
+        <input
+            type="text"
+            id="codigo_admin"
+            placeholder="Código de administrador"
+        >
+    </div>
+
+    <button type="submit" class="action-btn">
+        Criar Conta
+    </button>
+
+</form>
+
+<br>
+
+<a href="index.html" class="action-btn" style="text-decoration:none; text-align:center;">
+    Voltar
+</a>
+
+</section>
+</main>
+
+<div class="footer-bar">
+    <a href="contactos.html">Contactos</a>
+    <a href="sobre.html">Sobre o Sistema</a>
+</div>
+
+<script>
+const tipoConta = document.getElementById("tipoConta");
+
+function atualizarCampos() {
+    const tipo = tipoConta.value;
+
+    document.getElementById("campoNumeroIdentificacao").style.display = "none";
+    document.getElementById("campoDataNascimento").style.display = "none";
+    document.getElementById("campoFreguesia").style.display = "none";
+    document.getElementById("campoTelefone").style.display = "none";
+    document.getElementById("campoPin").style.display = "none";
+    document.getElementById("campoAdmin").style.display = "none";
+
+    if (tipo === "cc") {
+        document.getElementById("campoNumeroIdentificacao").style.display = "block";
+    }
+
+    if (tipo === "cmd") {
+        document.getElementById("campoTelefone").style.display = "block";
+        document.getElementById("campoPin").style.display = "block";
+    }
+
+    if (tipo === "recenseamento") {
+        document.getElementById("campoNumeroIdentificacao").style.display = "block";
+        document.getElementById("campoDataNascimento").style.display = "block";
+        document.getElementById("campoFreguesia").style.display = "block";
+    }
+
+    if (tipo === "admin") {
+        document.getElementById("campoAdmin").style.display = "block";
+    }
+}
+
+tipoConta.addEventListener("change", atualizarCampos);
+atualizarCampos();
+
+document.getElementById("formCriarConta").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const tipo = tipoConta.value;
+    const nome = document.getElementById("nome").value;
+
+    let email = "sem-email-" + Date.now() + "@sve.pt";
+    let password = "1234";
+    let role = "eleitor";
+    let numeroIdentificacao = "9" + String(Date.now()).slice(-8);
+    let telefone = null;
+    let freguesia = null;
+    let dataNascimento = "2000-01-01";
+    let recenseado = true;
+    let codigo = null;
+    let codigoAdmin = null;
+
+    if (tipo === "cc") {
+        numeroIdentificacao = document.getElementById("numero_identificacao").value;
+    }
+
+    if (tipo === "cmd") {
+        telefone = document.getElementById("telefone").value;
+        codigo = document.getElementById("codigo").value;
+    }
+
+    if (tipo === "recenseamento") {
+        numeroIdentificacao = document.getElementById("numero_identificacao").value;
+        dataNascimento = document.getElementById("data_nascimento").value;
+        freguesia = document.getElementById("freguesia").value;
+    }
+
+    if (tipo === "admin") {
+        role = "admin";
+        recenseado = false;
+        email = document.getElementById("email_admin").value;
+        password = document.getElementById("password_admin").value;
+        codigoAdmin = document.getElementById("codigo_admin").value;
+    }
+
+    const dados = {
+        nome: nome,
+        email: email,
+        password: password,
+        role: role,
+        codigo_admin: codigoAdmin,
+        codigo: codigo,
+        numero_identificacao: numeroIdentificacao,
+        telefone: telefone,
+        freguesia: freguesia,
+        data_nascimento: dataNascimento,
+        recenseado: recenseado
+    };
+
+    try {
+        const response = await fetch("http://localhost:8001/users", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        });
+
+        const resultado = await response.json();
+
+        if (!response.ok) {
+            alert("Erro ao criar conta: " + JSON.stringify(resultado));
+            return;
+        }
+
+        alert("Conta criada com sucesso!");
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao ligar à API.");
+    }
+});
+</script>
+
+</body>
+</html>
